@@ -36,7 +36,7 @@ def find_accuracy(train_set, test_set):
     return accuracy_result
 
 
-#2a tag using defaulttagger and print accuracy of each testing set
+#2a
 def default_tagger_accuracy():
     print("DEFAULT TAGGER ACCURACY:")
 
@@ -53,17 +53,15 @@ def default_tagger_accuracy():
     print("Test Data Accuracy, NPS Chat, 10% split: ", test_nps_result_10)
 
 #2b
-def combined_taggers_accuracy():
-    print("\nCombined Taggers Accuracy: ")
-
-    #finding most used tag
-    train_words = [word for sent in train_brown_50 for word in sent]
+def find_combined_taggers_accuracy(train_set, test_set):
+    # finding most used tag
+    train_words = [word for sent in train_set for word in sent]
     train_set_tags = [tag for (word, tag) in train_words]
     most_frequent_tag = FreqDist(train_set_tags).max()
     default_tagger = DefaultTagger(most_frequent_tag)
 
-    #default tagger
-    default_tagger_result = default_tagger.evaluate(test_brown_50)
+    # default tagger
+    default_tagger_result = default_tagger.evaluate(test_set)
     print("Default Tagger accuracy: ", default_tagger_result)
 
     # regex tagger
@@ -78,29 +76,46 @@ def combined_taggers_accuracy():
         (r'.*', 'NN')  # nouns (default)
     ]
     regex_tagger = RegexpTagger(patterns)
-    regex_tagger_result = regex_tagger.evaluate(test_brown_50)
-    print("\nRegex Tagger Accuracy: ", regex_tagger_result)
+    regex_tagger_result = regex_tagger.evaluate(test_set)
+    print("Regex Tagger Accuracy: ", regex_tagger_result)
 
-    #unigram tagger with default tagger as backoff
-    unigram_tagger = UnigramTagger(train_brown_50, backoff=default_tagger)
-    unigram_tagger_result = unigram_tagger.evaluate(test_brown_50)
-    print("\nUnigram Tagger accuracy (Backoff = Default Tagger): ", unigram_tagger_result)
+    # unigram tagger with default tagger as backoff
+    unigram_tagger = UnigramTagger(train_set, backoff=default_tagger)
+    unigram_tagger_result = unigram_tagger.evaluate(test_set)
+    print("Unigram Tagger accuracy (Backoff = Default Tagger): ", unigram_tagger_result)
 
     # bigram tagger with different backoffs
-    bigram_tagger = BigramTagger(train_brown_50)
-    bigram_tagger_backoff_unigram = BigramTagger(train_brown_50, backoff=unigram_tagger)
-    bigram_tagger_backoff_regex = BigramTagger(train_brown_50, backoff=regex_tagger)
+    bigram_tagger = BigramTagger(train_set)
+    bigram_tagger_backoff_unigram = BigramTagger(train_set, backoff=unigram_tagger)
+    bigram_tagger_backoff_regex = BigramTagger(train_set, backoff=regex_tagger)
 
-    bigram_tagger_result = bigram_tagger.evaluate(test_brown_50)
-    bigram_tagger_backoff_regex_result = bigram_tagger_backoff_regex.evaluate(test_brown_50)
-    bigram_tagger_backoff_unigram_result = bigram_tagger_backoff_unigram.evaluate(test_brown_50)
+    bigram_tagger_result = bigram_tagger.evaluate(test_set)
+    bigram_tagger_backoff_regex_result = bigram_tagger_backoff_regex.evaluate(test_set)
+    bigram_tagger_backoff_unigram_result = bigram_tagger_backoff_unigram.evaluate(test_set)
 
-    print("\nBigram Tagger Accuracy: ", bigram_tagger_result)
+    print("Bigram Tagger Accuracy: ", bigram_tagger_result)
     print("Bigram Tagger Accuracy (Backoff = Regex Tagger): ", bigram_tagger_backoff_regex_result)
     print("Bigram Tagger Accuracy (Backoff = Unigram Tagger): ", bigram_tagger_backoff_unigram_result)
 
 
+#have train and test as input
+def combined_taggers_accuracy():
+    print("\nCombined Taggers Accuracy: ")
+
+    print("\n__________________________\nBrown 50% split: ")
+    find_combined_taggers_accuracy(train_brown_50, test_brown_50)
+
+    print("\n__________________________\nBrown 90-10% split: ")
+    find_combined_taggers_accuracy(train_brown_90, test_brown_10)
+
+    print("\n__________________________\nNPS Chat 50% split: ")
+    find_combined_taggers_accuracy(train_nps_50, test_nps_50)
+
+    print("\n__________________________\nNPS Chat 90-10% split: ")
+    find_combined_taggers_accuracy(train_nps_90, test_nps_10)
+
 if __name__ == "__main__":
+
     #default_tagger_accuracy()
     combined_taggers_accuracy()
 
