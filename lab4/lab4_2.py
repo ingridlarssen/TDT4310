@@ -65,9 +65,9 @@ def find_probability():
 if __name__ == '__main__':
     api = get_auth()
     username = 'realDonaldTrump'
-    N = 2
+    N = 3
     TEXT = "it is not"
-    tweets = get_tweets(api, username, 1000)
+    tweets = get_tweets(api, username, 3000)
     print("Fetched " + str(len(tweets)) + " tweets from " + username)
     ngrams = []
     tokenizer = TweetTokenizer()
